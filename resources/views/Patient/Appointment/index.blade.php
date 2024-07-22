@@ -24,9 +24,6 @@
                 <h6 class="fw-semibold mb-0">Doctor</h6>
               </th>
               <th class="border-bottom-0">
-                <h6 class="fw-semibold mb-0">Created By</h6>
-              </th>
-              <th class="border-bottom-0">
                 <h6 class="fw-semibold mb-0">Status</h6>
               </th>
               <th class="border-bottom-0"></th>
@@ -48,13 +45,6 @@
               </td>
               <td class="border-bottom-0">
                 <p class="mb-0 fw-normal">{{$appointment->doctor->full_name}}</p>
-              </td>
-              <td class="border-bottom-0">
-                <p class="mb-0 fw-normal">{{$appointment->user->name}}</p>
-              </td>
-
-              <td class="border-bottom-0">
-                <p class="mb-0 fw-normal">{{$appointment->status}}</p>
               </td>
 
               <td class="border-bottom-0">

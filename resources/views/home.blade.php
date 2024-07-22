@@ -14,6 +14,16 @@
       window.location.href = '/';
     }
   </script>
+  <style>
+    .collapse-icon {
+      margin-left: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .collapse.show .collapse-icon>i {
+      transform: rotate(180deg);
+    }
+  </style>
 </head>
 
 <body>
@@ -50,25 +60,8 @@
             </li>
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">Settings</span>
+              <span class="hide-menu"></span>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{{route('role.index')}}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-alert-circle"></i>
-                </span>
-                <span class="hide-menu">Roles</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="{{route('user.index')}}" aria-expanded="false">
-                <span>
-                  <i class="ti ti-users"></i>
-                </span>
-                <span class="hide-menu">Users</span>
-              </a>
-            </li>
-
             <li class="sidebar-item">
               <a class="sidebar-link" href="{{route('patient.index')}}" aria-expanded="false">
                 <span>
@@ -93,6 +86,37 @@
                 <span class="hide-menu">Appointment</span>
               </a>
             </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false" data-toggle="collapse" data-target="#settingsMenu">
+                <span>
+                  <i class="ti ti-settings"></i>
+                </span>
+                <span class="hide-menu">Settings</span>
+                <span class="collapse-icon">
+                  <i class="ti ti-chevron-down"></i>
+                </span>
+              </a>
+              <ul id="settingsMenu" class="collapse first-level" aria-expanded="false">
+                <li class="sidebar-item">
+                  <a class="sidebar-link" href="{{route('role.index')}}" aria-expanded="false">
+                    <span>
+                      <i class="ti ti-alert-circle"></i>
+                    </span>
+                    <span class="hide-menu">Roles</span>
+                  </a>
+                </li>
+                <li class="sidebar-item">
+                  <a class="sidebar-link" href="{{route('user.index')}}" aria-expanded="false">
+                    <span>
+                      <i class="ti ti-users"></i>
+                    </span>
+                    <span class="hide-menu">Users</span>
+                  </a>
+                </li>
+
+              </ul>
+            </li>
+
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">AUTH</span>
@@ -255,6 +279,7 @@
         }
       </script>
       <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
       @include('layouts.alert_success')
 
 </body>
