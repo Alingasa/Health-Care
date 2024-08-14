@@ -34,7 +34,7 @@
                     <div class="mb-3">
                       <label for="appointmentDate" class="form-label">Doctor </label>
 
-                      <input type="text" readonly value="{{$appointment->doctor->full_name}}" class="form-control @error('appointment_date') is-invalid @enderror" id="appointmentDate" required>
+                      <input type="text" readonly value="{{$appointment->doctor->full_name ?? 'Not Approved Yet'}}" class="form-control @error('appointment_date') is-invalid @enderror" id="appointmentDate" required>
                       @error('appointment_date')
                       <p class="text-danger">{{$message}}</p>
                       @enderror

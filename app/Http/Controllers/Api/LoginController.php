@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Mail\NewUserMail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -17,22 +18,28 @@ class LoginController extends Controller
     {
         try {
 
+
             $credentials = $request->validate([
                 'email' => 'required|email',
                 'password' => 'required'
             ]);
 
+            // dd($credentials);
+
             $user = User::where('email', $request->email)->first();
+
 
             if (!$user || !Hash::check($credentials['password'], $user->password)) {
                 return response()->json([
                     'message' => 'Invalid Credentials',
                 ]);
             }
+
             // return 'awj okay na';
             $code = rand(100000, 999999);
             $user->otp = Hash::make($code);
             $user->save();
+
 
             //Mail Trap After
             // Http::asForm()->post(env('SEMAPHORE_API_URI'), [
@@ -41,9 +48,9 @@ class LoginController extends Controller
             //     'message' => 'Your One-Time PIN: ' . $code,
             // ]);
 
-            Mail::to($user->email)
-                ->send(new NewUserMail($code));
-
+            // Mail::to($user->email)
+            //     ->send(new NewUserMail($code));
+            // dd($user);
 
             return response()->json([
                 'message' => 'OTP sent successfully',
@@ -69,9 +76,13 @@ class LoginController extends Controller
         if (!$user || !Hash::check($request->otp, $user->otp)) {
             return response()->json(['message' => 'Invalid OTP'], 401);
         }
+
+        Auth::login($user);
+
+        // auth()->login($user);
         $user->save();
 
-        return response()->json(['token' => $user->createToken('TOKEN')->plainTextToken]);
+        return response()->json(['token' => $user->createToken('TOKEN')->plainTextToken, 'role_id' => $user->role_id]);
     }
 
     public function login()

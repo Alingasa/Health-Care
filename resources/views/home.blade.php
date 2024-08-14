@@ -9,43 +9,84 @@
   <link rel="stylesheet" href="{{asset('dash_board/assets/css/styles.min.css')}}" />
   <script>
     const token = localStorage.getItem('TOKEN');
-    console.log(token);
+    // console.log(localStorage.getItem('id'));
     if (!token) {
       window.location.href = '/';
     }
-  </script>
-  <style>
-    .collapse-icon {
-      margin-left: auto;
-      transition: transform 0.3s ease;
-    }
+    const userId = localStorage.getItem('id');
+    // console.log(userId);
+    document.addEventListener("DOMContentLoaded", function() {
+      fetch('/api/user', {
+          method: 'GET',
+          headers: {
+            Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),
+            Accept: 'application/json',
+            body: JSON.stringify({
+              user_id: userId
+            })
+          }
+        }).then(response => response.json())
+        .then(response => {
+          const userImage = response.profile_image ? response.profile_image : 'images/profile_default.png';
+          if (response.role_id == 1) {
+            document.getElementById('roleName').textContent = 'Admin';
+          } else if (response.role_id == 2) {
+            document.getElementById('roleName').textContent = 'Patient';
+          } else if (response.role_id == 3) {
+            document.getElementById('roleName').textContent = 'Doctor';
+          }
 
-    .collapse.show .collapse-icon>i {
-      transform: rotate(180deg);
-    }
-  </style>
-</head>
-
-<body>
-  <!--  Body Wrapper -->
-  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
-    <!-- Sidebar Start -->
-    <aside class="left-sidebar">
-      <!-- Sidebar scroll-->
-      <div>
-        <div class="brand-logo d-flex align-items-center justify-content-between">
-          <a href="/dashboard" class="text-nowrap logo-img">
-            <h4 class="fw-semibold mb-0">Health-Care-System</h4>
-            <!-- <img src="{{asset('dash_board/assets/images/logos/dark-logo.svg')}}" width="180" alt="" /> -->
-            <!-- <h2 width="180" class="text-center text-bold">Health Care</h2> -->
-          </a>
-          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
-            <i class="ti ti-x fs-8"></i>
-          </div>
-        </div>
-        <!-- Sidebar navigation-->
-        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
-          <ul id="sidebarnav">
+          document.getElementById('userID').src = userImage;
+          if (response.role_id == 3) {
+            document.getElementById('containerDoctor').innerHTML = `          <ul id="sidebarnav">
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Home</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/doctor-dashboard" aria-expanded="false">
+                <span>
+                  <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
+            <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu"></span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{route('patient.index')}}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-users"></i>
+                </span>
+                <span class="hide-menu">Patients</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{route('status.index')}}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-file-description"></i>
+                </span>
+                <span class="hide-menu">Appointment</span>
+              </a>
+            </li>
+              <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Records</span>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{{route('record.index')}}" aria-expanded="false">
+                <span>
+                  <i class="fas fa-book-open"></i>
+                </span>
+                <span class="hide-menu">Medical Records</span>
+              </a>
+            </li>`;
+          }
+          if (response.role_id == 1) {
+            document.getElementById('adminContainer').innerHTML = `
+            <ul id="sidebarnav">
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
               <span class="hide-menu">Home</span>
@@ -86,17 +127,13 @@
                 <span class="hide-menu">Appointment</span>
               </a>
             </li>
+             <li class="nav-small-cap">
+              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+              <span class="hide-menu">Settings</span>
+            </li>
             <li class="sidebar-item">
-              <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false" data-toggle="collapse" data-target="#settingsMenu">
-                <span>
-                  <i class="ti ti-settings"></i>
-                </span>
-                <span class="hide-menu">Settings</span>
-                <span class="collapse-icon">
-                  <i class="ti ti-chevron-down"></i>
-                </span>
-              </a>
-              <ul id="settingsMenu" class="collapse first-level" aria-expanded="false">
+
+              <ul  class=" first-level" aria-expanded="false">
                 <li class="sidebar-item">
                   <a class="sidebar-link" href="{{route('role.index')}}" aria-expanded="false">
                     <span>
@@ -113,62 +150,77 @@
                     <span class="hide-menu">Users</span>
                   </a>
                 </li>
+                <li class="sidebar">
+                  <a class="sidebar-link" href="#" aria-expanded="false">
+                    <span>
+                      <i class="ti ti-clock"></i>
+                    </span>
+                    <span class="hide-menu">{{now()->format('l , h:i:s A')}}</span>
+                  </a>
+                </li>
 
-              </ul>
+             
             </li>
 
             <li class="nav-small-cap">
               <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">AUTH</span>
+              <span class="hide-menu">Records</span>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./authentication-login.html" aria-expanded="false">
+              <a class="sidebar-link" href="{{route('record.index')}}" aria-expanded="false">
                 <span>
-                  <i class="ti ti-login"></i>
+                  <i class="fas fa-book-open"></i>
                 </span>
-                <span class="hide-menu">Login</span>
+                <span class="hide-menu">Medical Records</span>
               </a>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./authentication-register.html" aria-expanded="false">
-                <span>
-                  <i class="ti ti-user-plus"></i>
-                </span>
-                <span class="hide-menu">Register</span>
-              </a>
-            </li>
-            <li class="nav-small-cap">
-              <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-              <span class="hide-menu">EXTRA</span>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./icon-tabler.html" aria-expanded="false">
-                <span>
-                  <i class="ti ti-mood-happy"></i>
-                </span>
-                <span class="hide-menu">Icons</span>
-              </a>
-            </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="./sample-page.html" aria-expanded="false">
-                <span>
-                  <i class="ti ti-aperture"></i>
-                </span>
-                <span class="hide-menu">Sample Page</span>
-              </a>
-            </li>
-          </ul>
-          <div class="unlimited-access hide-menu bg-light-primary position-relative mb-7 mt-5 rounded">
-            <div class="d-flex">
-              <div class="unlimited-access-title me-3">
-                <h6 class="fw-semibold fs-4 mb-6 text-dark w-85">Upgrade to pro</h6>
-                <a href="https://adminmart.com/product/modernize-bootstrap-5-admin-template/" target="_blank" class="btn btn-primary fs-2 fw-semibold lh-sm">Buy Pro</a>
-              </div>
-              <div class="unlimited-access-img">
-                <img src="{{asset('dash_board/assets/images/backgrounds/rocket.png')}}" alt="" class="img-fluid">
-              </div>
-            </div>
+          </ul>`;
+          }
+
+          // const userId = response.id;
+
+          // Store user ID in localStorage
+          // localStorage.setItem('USER_ID', userId);
+
+          console.log(response);
+        });
+    });
+  </script>
+  <style>
+    .collapse-icon {
+      margin-left: auto;
+      transition: transform 0.3s ease;
+    }
+
+    .collapse.show .collapse-icon>i {
+      transform: rotate(180deg);
+    }
+  </style>
+</head>
+
+<body>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full" data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar">
+      <!-- Sidebar scroll-->
+      <div>
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="/dashboard" class="text-nowrap logo-img">
+            <h4 class="fw-semibold mb-0">Health-Care-System</h4>
+            <!-- <img src="{{asset('dash_board/assets/images/logos/dark-logo.svg')}}" width="180" alt="" /> -->
+            <!-- <h2 width="180" class="text-center text-bold">Health Care</h2> -->
+          </a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+            <i class="ti ti-x fs-8"></i>
           </div>
+        </div>
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav scroll-sidebar" data-simplebar="">
+          <div id="containerDoctor"></div>
+          <div id="adminContainer"></div>
+
+
         </nav>
         <!-- End Sidebar navigation -->
       </div>
@@ -186,12 +238,20 @@
                 <i class="ti ti-menu-2"></i>
               </a>
             </li>
+            @php
+            use App\Models\Notification;
+            $notification = Notification::get();
+            @endphp
             <li class="nav-item">
-              <a class="nav-link nav-icon-hover" href="javascript:void(0)">
+              <a class="nav-link nav-icon-hover" href="#" data-bs-toggle="modal" data-bs-target="#notifModal">
                 <i class="ti ti-bell-ringing"></i>
-                <div class="notification bg-primary rounded-circle"></div>
+                <div class="notification bg-primary rounded-circle position-relative">
+                  <span class="badge bg-danger position-absolute top-0 start-100 translate-middle rounded-pill">{{count($notification)}}</span>
+                </div>
               </a>
             </li>
+
+
           </ul>
           <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
             <ul class="navbar-nav flex-row ms-auto align-items-center justify-content-end">
@@ -199,6 +259,7 @@
               <li class="nav-item dropdown">
                 <a class="nav-link nav-icon-hover" href="javascript:void(0)" id="drop2" data-bs-toggle="dropdown" aria-expanded="false">
 
+                  <h5 id="roleName" style="padding-right: 10px; color: blue"></h5>
                   <img id="userID" width="35" height="35" class="rounded-circle">
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop2">
@@ -227,6 +288,7 @@
       <div class="container-fluid">
         <!--  Row 1 -->
         @yield('content')
+        @include('notification')
       </div>
       <script src="{{asset('dash_board/assets/libs/jquery/dist/jquery.min.js')}}"></script>
       <script src="{{asset('dash_board/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js')}}"></script>
@@ -236,6 +298,8 @@
       <script src="{{asset('dash_board/assets/libs/simplebar/dist/simplebar.js')}}"></script>
       <script src="{{asset('dash_board/assets/js/dashboard.js')}}"></script>
       <script>
+        // const UserId = localStorage.getItem('id');
+        // console.log(userId);
         document.addEventListener("DOMContentLoaded", function() {
           fetch('/api/user', {
               method: 'GET',
@@ -247,6 +311,13 @@
             .then(response => {
               const userImage = response.profile_image ? response.profile_image : 'images/profile_default.png';
               document.getElementById('userID').src = userImage;
+
+              // const userIlkmd = response.id;
+
+              // Store user ID in localStorage
+              // localStorage.setItem('USER_ID', userId);
+
+              console.log(response);
             });
         });
       </script>

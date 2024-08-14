@@ -1,6 +1,32 @@
 @extends('home')
 @section('content')
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const userId = localStorage.getItem('USER_ID');
+    console.log(userId);
+    fetch('/api/user', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),
+          Accept: 'application/json',
+          body: JSON.stringify({
+            user_id: userId
+          })
+        }
 
+      }).then(response => response.json())
+      .then(response => {
+        console.log(response);
+        const userImage = response.profile_image ? response.profile_image : 'images/profile_default.png';
+        document.getElementById('userID').src = userImage;
+        if (response.role_id == 2) {
+          // document.querySelector('#admin').classList.add('d-block');
+          window.location.href = '/patientRole/' + response.id;
+        }
+        // console.log(response);
+      });
+  });
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <div class="col-lg-12 d-flex align-items-stretch">
@@ -38,6 +64,8 @@
                   <!-- <a href="{{route('role.edit', $role->id)}}" class="btn btn-sm btn-info me-2">
                     <i class="fas fa-edit"></i>
                   </a> -->
+                  @if($role->role_name == 'Admin' || $role->role_name == 'Patient' || $role->role_name == 'Nurse' || $role->role_name == 'Doctor')
+                  @else
                   <a href="#" class="btn btn-sm btn-success me-2" data-bs-toggle="modal" data-bs-target="#editUserModal{{$role->id}}">
                     <i class="fas fa-eye"></i>
                   </a>
@@ -46,6 +74,7 @@
                     <i class="fas fa-trash-alt"></i>
                   </a>
                   @include('Role.delete')
+                  @endif
                 </div>
               </td>
             </tr>

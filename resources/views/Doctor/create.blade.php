@@ -1,5 +1,32 @@
 @extends('home')
 @section('content')
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const userId = localStorage.getItem('USER_ID');
+    console.log(userId);
+    fetch('/api/user', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),
+          Accept: 'application/json',
+          body: JSON.stringify({
+            user_id: userId
+          })
+        }
+
+      }).then(response => response.json())
+      .then(response => {
+        console.log(response);
+        const userImage = response.profile_image ? response.profile_image : 'images/profile_default.png';
+        document.getElementById('userID').src = userImage;
+        if (response.role_id == 2) {
+          // document.querySelector('#admin').classList.add('d-block');
+          window.location.href = '/patientRole/' + response.id;
+        }
+        // console.log(response);
+      });
+  });
+</script>
 <div class="card-body">
   <h5 class="card-title fw-semibold mb-4">Create Doctor</h5>
   <div class="card">

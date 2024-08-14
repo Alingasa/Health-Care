@@ -30,7 +30,7 @@
                   <!-- <img src="dash_board/assets/images/logos/dark-logo.svg" width="180" alt=""> -->
                 </a>
                 <p class="text-center">Your Health is Our Priority</p>
-                <form id="LoginForm">
+                <form id="LoginForm" method="POST">
                   <div id="message" class="text-danger"></div>
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Username</label>
@@ -50,10 +50,7 @@
                     <a class="text-primary fw-bold" href="./index.html">Forgot Password ?</a>
                   </div>
                   <button type="submit" class="btn btn-primary w-100 py-8 fs-4 mb-4 rounded-2">Sign In</button>
-                  <div class="d-flex align-items-center justify-content-center">
-                    <p class="fs-4 mb-0 fw-bold">New to Modernize?</p>
-                    <a class="text-primary fw-bold ms-2" href="./authentication-register.html">Create an account</a>
-                  </div>
+
                 </form>
                 <form id="Otp">
                   <div id="message3" class="text-danger"></div>
@@ -86,6 +83,7 @@
           Accept: 'application/json',
         }
       }).then(response => {
+        // dd(response);
         return response.json();
       }).then(response => {
         // console.log(response.data)
@@ -120,20 +118,54 @@
         return response.json();
       }).then(response => {
         console.log(response.message);
-        if (response.token) {
-          localStorage.setItem('TOKEN', response.token);
-          Swal.fire({
-            icon: 'success',
-            title: 'Login Successfully!',
-            showConfirmButton: false,
-            timer: 2500
-          }).then(() => {
-            window.location.href = '/dashboard';
-          })
-        } else {
-          window.alert(response.message);
+        if (response.role_id == '2') {
+          if (response.token) {
+            localStorage.setItem('TOKEN', response.token);
+            Swal.fire({
+              icon: 'success',
+              title: 'Login Successfully!',
+              showConfirmButton: false,
+              timer: 2500
+            }).then(() => {
+              window.location.href = '/patientRole';
+            })
+          } else {
+            window.alert(response.message);
 
+          }
         }
+        if (response.role_id == '3') {
+          if (response.token) {
+            localStorage.setItem('TOKEN', response.token);
+            Swal.fire({
+              icon: 'success',
+              title: 'Login Successfully!',
+              showConfirmButton: false,
+              timer: 2500
+            }).then(() => {
+              window.location.href = '/doctor-dashboard';
+            })
+          } else {
+            window.alert(response.message);
+
+          }
+        } else {
+          if (response.token) {
+            localStorage.setItem('TOKEN', response.token);
+            Swal.fire({
+              icon: 'success',
+              title: 'Login Successfully!',
+              showConfirmButton: false,
+              timer: 2500
+            }).then(() => {
+              window.location.href = '/dashboard';
+            })
+          } else {
+            window.alert(response.message);
+
+          }
+        }
+
       });
     });
   </script>

@@ -1,6 +1,59 @@
 @extends('home')
 @section('content')
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const userId = localStorage.getItem('USER_ID');
+    console.log(userId);
+    fetch('/api/user', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),
+          Accept: 'application/json',
+          body: JSON.stringify({
+            user_id: userId
+          })
+        }
 
+      }).then(response => response.json())
+      .then(response => {
+        console.log(response);
+        const userImage = response.profile_image ? response.profile_image : 'images/profile_default.png';
+        document.getElementById('userID').src = userImage;
+        if (response.role_id == 2) {
+          // document.querySelector('#admin').classList.add('d-block');
+          window.location.href = '/patientRole/' + response.id;
+        }
+        // console.log(response);
+      });
+  });
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const userId = localStorage.getItem('USER_ID');
+    console.log(userId);
+    fetch('/api/user', {
+        method: 'GET',
+        headers: {
+          Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),
+          Accept: 'application/json',
+          body: JSON.stringify({
+            user_id: userId
+          })
+        }
+
+      }).then(response => response.json())
+      .then(response => {
+        console.log(response);
+        const userImage = response.profile_image ? response.profile_image : 'images/profile_default.png';
+        document.getElementById('userID').src = userImage;
+        if (response.role_id == 2) {
+          // document.querySelector('#admin').classList.add('d-block');
+          window.location.href = '/patientRole/' + response.id;
+        }
+        // console.log(response);
+      });
+  });
+</script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <div class="col-lg-12 d-flex align-items-stretch">

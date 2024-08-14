@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -36,7 +37,13 @@ class RoleController extends Controller
         $data = $request->validate([
             'role_name' => 'required|unique:roles',
         ]);
+        $mytime = \Carbon\Carbon::now();
+        $roleName = $data['role_name'];
 
+        Notification::create([
+            'day' => $mytime->format('h:i:s A'),
+            'message' => 'Add Role' . '/'  . $roleName . '-',
+        ]);
         Role::create($data);
 
         return redirect()->route('role.index')->with('add_success', 'success');

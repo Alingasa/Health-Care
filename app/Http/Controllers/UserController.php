@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Doctor;
 use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\Doctor;
 use App\Models\Profile;
+use App\Mail\NewUserAccount;
+use App\Models\Notification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -44,6 +47,7 @@ class UserController extends Controller
         // dd($request->all());
         // dd('mweehehehe');
 
+
         $data = $request->validate([
             'role_id' => 'required',
             'first_name' => 'required',
@@ -55,6 +59,7 @@ class UserController extends Controller
             'email' => 'required|unique:profiles',
         ]);
 
+        // dd($data['role_id']);
         if ($request->hasFile('profile_image')) {
             $image = $request->file('profile_image');
             $imagePath = $image->store('images', 'public');
@@ -63,6 +68,7 @@ class UserController extends Controller
             $data['profile_image'] = null;
         }
 
+        // dd(strtolower($data['first_name'][0]));
 
         $email = strtolower($data['first_name'][0]) . '.' . strtolower($data['last_name']) . '@healthcare.com';
 
@@ -73,14 +79,46 @@ class UserController extends Controller
         }
 
         $data['user_id'] =  User::create([
+            'role_id' => $data['role_id'],
             'profile_image' => $data['profile_image'] ?? null,
             'name' => $data['first_name'] . ' ' . $data['last_name'],
             'email' => $email,
             'password' => 'healthcare2024',
         ])->id;
 
-        Profile::create($data);
+        $getRole =  Profile::create($data);
 
+        $mytime = \Carbon\Carbon::now();
+        $fullName = $data['first_name'] . ' ' . $data['last_name'];
+
+        // dd($getRole);
+        if ($getRole->role_id == '2') {
+            Notification::create([
+                'day' => $mytime->format('h:i:s A'),
+                'message' => 'Add Patient' . '/'  . $fullName . '-',
+            ]);
+        }
+        if ($getRole->role_id == '1') {
+            Notification::create([
+                'day' => $mytime->format('h:i:s A'),
+                'message' => 'Add Admin' . '/'  . $fullName . '-',
+            ]);
+        }
+        if ($getRole->role_id == '3') {
+            Notification::create([
+                'day' => $mytime->format('h:i:s A'),
+                'message' => 'Add Doctor' . '/'  . $fullName . '-',
+            ]);
+        }
+
+
+        // $notif = Notification::create([
+        //     'day' => $mytime->format('h:i:s A'),
+        //     'message' => 'Add User' . '/'  . $fullName . '-',
+        // ]);
+        // sleep(10);
+        // dd($notif);
+        // $notif->delete();
         $doctor = Profile::with('role')
             ->whereHas('role', function ($query) {
                 $query->where('role_name', 'Doctor');
@@ -100,6 +138,8 @@ class UserController extends Controller
             $doctor->save();
         }
 
+        // Mail::to($data['email'])
+        //     ->send(new NewUserAccount($email, 'healthcare2024'));
         return redirect()->route('user.index')->with('add_success', 'added successfully');
     }
 
@@ -184,6 +224,14 @@ class UserController extends Controller
         $account->delete();
         $user->delete();
 
+        $mytime = \Carbon\Carbon::now();
+
+        Notification::create([
+            'day' => $mytime->format('h:i:s A'),
+            'message' => 'Delete User' . '/'  . $user['full_name'] . '-',
+        ]);
         return redirect()->route('user.index')->with('delete', 'success');
     }
+
+    //patientProfile
 }

@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
 use App\Models\User;
 use App\Models\Profile;
+use App\Models\Appointment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class AppointmentController extends Controller
@@ -37,6 +38,8 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
+        // dd('kjdsafksaf');
         //
         // $u =  auth()->user()->id;
 
@@ -60,6 +63,12 @@ class AppointmentController extends Controller
         }
         // dd($data);
         Appointment::create($data);
+        $mytime = \Carbon\Carbon::now();
+
+        Notification::create([
+            'day' => $mytime->format('h:i:s A'),
+            'message' => 'Add Appointment',
+        ]);
         return redirect()->route('patient.edit', $data['profile_id'])->with('add_success', 'succeses');
     }
 
@@ -69,6 +78,12 @@ class AppointmentController extends Controller
     public function show(string $id)
     {
         //=
+        $profile = Profile::where('user_id', $id)->with('appointments')->first();
+
+        // dd($profile->id);
+        return redirect()->to('patient/' . $profile->id . '/edit');
+        // dd($profile);
+
 
         // $appointment = Appointment::where('profile_id', $id);
         // // dd($appointment);
@@ -111,8 +126,19 @@ class AppointmentController extends Controller
         }
         $profile = Appointment::findorFail($id);
 
+        if ($profile['appointment_date'] != $data['appointment_date']) {
+            $profile->update([
+                'update' => 1,
+            ]);
+        }
 
         $profile->update($data);
+        $mytime = \Carbon\Carbon::now();
+
+        Notification::create([
+            'day' => $mytime->format('h:i:s A'),
+            'message' => 'Update Appointment',
+        ]);
         // dd($profile->doctor_id);
         $profile->save();
         return redirect()->back()->with('update_success', 'success');
@@ -126,6 +152,6 @@ class AppointmentController extends Controller
         //
         $delete = Appointment::findorFail($id);
         $delete->delete();
-        return redirect()->route('patient.edit', $delete->profile_id)->with('delete', 'success');
+        return redirect()->back()->with('delete', 'success');
     }
 }

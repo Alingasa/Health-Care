@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\Appointment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 
 class PatientController extends Controller
@@ -121,7 +122,7 @@ class PatientController extends Controller
         // dd($data);
         $profile->update($data);
         // dd($data);
-        return redirect()->route('patient.index')->with('update_success', 'success');
+        return redirect()->back()->with('update_success', 'success');
     }
 
     /**
@@ -132,6 +133,12 @@ class PatientController extends Controller
         //
         $delete = Profile::findorFail($id);
 
+        $mytime = \Carbon\Carbon::now();
+
+        Notification::create([
+            'day' => $mytime->format('h:i:s A'),
+            'message' => 'Deleted Patient' . '/' . $delete['full_name'] . '-',
+        ]);
         $delete->delete();
 
         return redirect()->route('patient.index')->with('delete', 'success');

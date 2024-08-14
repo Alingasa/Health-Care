@@ -1,4 +1,3 @@
-<!-- update Appointment Modal -->
 <div class="modal fade" id="approveUserModal{{$appointment->id}}" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel{{$appointment->id}}" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -10,6 +9,7 @@
       <form id="approveUserForm{{$appointment->id}}" action="{{ route('status.update', $appointment->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        <input type="hidden" name="doctor_id" id="doctorID{{$appointment->id}}">
         <div class="modal-body">
           <div class="mb-1">
             <p style="padding-top: 15px;">Are you sure you want to Approve <span class="text-danger">{{ "$appointment->appointment_date" }}</span>?</p>
@@ -64,3 +64,19 @@
     </div>
   </div>
 </div>
+<!-- update Appointment Modal -->
+<script>
+  fetch('/api/user', {
+      method: 'GET',
+      headers: {
+        Authorization: 'Bearer ' + localStorage.getItem('TOKEN'),
+        Accept: 'application/json',
+      }
+    }).then(response => response.json())
+    .then(response => {
+      console.log(response.id);
+      document.querySelectorAll('[id^="doctorID"]').forEach(element => {
+        element.value = response.id;
+      });
+    })
+</script>

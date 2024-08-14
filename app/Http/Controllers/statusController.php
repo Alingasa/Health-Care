@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use App\Models\Doctor;
 use App\Models\Profile;
 use App\Models\Appointment;
+use App\Models\Notification;
 use Illuminate\Http\Request;
+use App\Models\PatientNotification;
 
 class statusController extends Controller
 {
@@ -16,7 +18,7 @@ class statusController extends Controller
     public function index()
     {
         //
-        $appointments = Appointment::with('user', 'profile', 'doctor')->where('status', 'Approved')->simplePaginate(5);
+        $appointments = Appointment::with('user', 'profile', 'doctor', 'prescription')->simplePaginate(5);
 
         $doctors = Doctor::get();
 
@@ -65,18 +67,53 @@ class statusController extends Controller
     public function update(Request $request, string $id)
     {
         //
+
+        // dd($request->all());
+        $doctorId = Profile::where('user_id', $request['doctor_id'])?->first()?->id;
+        // dd($doctorId);
         $appointment = Appointment::findorFail($id);
+        // dd(Doctor::all(), $appointment);
+        // dd($appointment);
+
 
         if ($appointment->status == 'Approved') {
             $appointment->update([
                 'status' => 'Pending',
+            ]);
+
+            $mytime = \Carbon\Carbon::now();
+
+            Notification::create([
+                'day' => $mytime->format('h:i:s A'),
+                'message' => 'Rejected Appointment',
+            ]);
+            PatientNotification::create([
+                'patient_id' => $appointment->profile_id,
+                'day' => $mytime->format('h:i:s A'),
+                'message' => 'Your Appointment Has Been Rejected',
             ]);
             $appointment->save();
 
             return redirect()->back()->with('rejected', 'success');
         } else {
             $appointment->update([
+                'doctor_id' => $doctorId,
                 'status' => 'Approved',
+            ]);
+            // dd($appointment);
+            $mytime = \Carbon\Carbon::now();
+
+            Notification::create([
+                'day' => $mytime->format('h:i:s A'),
+                'message' => 'Approved Appointment',
+            ]);
+            // $mytime = \Carbon\Carbon::now();
+            // $fullName = $data['first_name'] . ' ' . $data['last_name'];
+
+            PatientNotification::create([
+                'patient_id' => $appointment->profile_id,
+                'day' => $mytime->format('h:i:s A'),
+                'message' => 'Your Appointment Approved Successfully',
             ]);
             $appointment->save();
             return redirect()->back()->with('approved', 'success');
@@ -92,5 +129,10 @@ class statusController extends Controller
     public function destroy(string $id)
     {
         //
+        // dd('aw');
+        // dd($id);
+        $delete = Notification::findorFail($id);
+        $delete->delete();
+        return redirect()->back()->with('delete', 'deleted');
     }
 }
